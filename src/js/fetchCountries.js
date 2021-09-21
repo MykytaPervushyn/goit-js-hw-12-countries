@@ -18,7 +18,7 @@ refs.searchForm.addEventListener('input', debounce(onSearch, DELAY));
 
 
 function onSearch(e) {
-    const searchQuery = e.target.value;
+    const searchQuery = e.target.value.trim();
 
     API.fetchCountryByName(searchQuery)
         .then(renderCountryCard)
@@ -27,20 +27,23 @@ function onSearch(e) {
 
 
 
-function renderCountryCard(country) {if (country.status === 404) {
-    onFetchError()
+function renderCountryCard(country) {
+    if (country.length === 1) {
+        refs.cardContainer.innerHTML = countryCardTpl(country);
     return
+    } else if (country.length >= 2 && country.length <= 10) {
+        refs.cardContainer.innerHTML = countriesListTpl(country)
+        return
     } else if (country.length > 10) {
     refs.cardContainer.innerHTML = ''
     alert({ text: 'Too many matches found. Please enter a more specific query!', })
     return
-    } else if (country.length > 1) {
-        refs.cardContainer.innerHTML = countriesListTpl(country)
-        return
-    }
-        refs.cardContainer.innerHTML = countryCardTpl(country);
+    } 
+        onFetchError()
 }
+
+
 function onFetchError(error) {
     refs.cardContainer.innerHTML = ''
     alert({ text: 'Not found entered country!', })
-    }
+}
